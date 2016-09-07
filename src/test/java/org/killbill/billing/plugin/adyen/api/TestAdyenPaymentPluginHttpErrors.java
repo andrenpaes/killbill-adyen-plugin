@@ -200,8 +200,6 @@ public class TestAdyenPaymentPluginHttpErrors {
 
     @Test(groups = "slow", enabled=false)
     public void testAuthorizeWithInvalidValues() throws Exception {
-        final String expectedGatewayError = "validation Expiry month should be between 1 and 12 inclusive Card";
-        final String expectedGatewayErrorCode = "o.a.cxf.binding.soap.SoapFault";
         final Account account = defaultAccount();
         final OSGIKillbillAPI killbillAPI = TestUtils.buildOSGIKillbillAPI(account);
         final Payment payment = killBillPayment(account, killbillAPI);
@@ -213,16 +211,13 @@ public class TestAdyenPaymentPluginHttpErrors {
                                                                       .withDatabaseAccess(dao)
                                                                       .build();
 
+        // Adyen responds with a 422, which is mapped to REQUEST_NOT_SEND -> CANCELLED
         final PaymentTransactionInfoPlugin result = authorizeCall(account, payment, callContext, pluginApi, invalidCreditCardData(AdyenPaymentPluginApi.PROPERTY_CC_EXPIRATION_MONTH, String.valueOf("123")));
         assertEquals(result.getStatus(), PaymentPluginStatus.CANCELED);
-        assertEquals(result.getGatewayError(), expectedGatewayError);
-        assertEquals(result.getGatewayErrorCode(), expectedGatewayErrorCode);
 
         final List<PaymentTransactionInfoPlugin> results = pluginApi.getPaymentInfo(account.getId(), payment.getId(), ImmutableList.<PluginProperty>of(), callContext);
         assertEquals(results.size(), 1);
         assertEquals(results.get(0).getStatus(), PaymentPluginStatus.CANCELED);
-        assertEquals(results.get(0).getGatewayError(), expectedGatewayError);
-        assertEquals(results.get(0).getGatewayErrorCode(), expectedGatewayErrorCode);
     }
 
     @Test(groups = "slow")
