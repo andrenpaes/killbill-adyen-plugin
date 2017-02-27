@@ -19,6 +19,7 @@ package org.killbill.billing.plugin.adyen.client;
 
 import java.util.Properties;
 
+import org.joda.time.Period;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -47,6 +48,9 @@ public class TestAdyenConfigProperties {
         Assert.assertEquals(adyenConfigProperties.getHmacSecret("DefaultSkin"), "DefaultSecret");
 
         Assert.assertEquals(adyenConfigProperties.getHmacAlgorithm("DefaultSkin"), "HmacSHA256");
+
+        Assert.assertEquals(adyenConfigProperties.getPendingPaymentExpirationPeriod(), Period.days(3));
+        Assert.assertEquals(adyenConfigProperties.getPending3DsPaymentExpirationPeriod(), Period.hours(3));
     }
 
     @Test(groups = "fast")
@@ -58,6 +62,7 @@ public class TestAdyenConfigProperties {
         properties.put("org.killbill.billing.plugin.adyen.skin", "UK#DefaultSkinUK|US#DefaultSkinUS|DE#DefaultSkinDE");
         properties.put("org.killbill.billing.plugin.adyen.hmac.secret", "UK#DefaultSecretUK|US#DefaultSecretUS|DE#DefaultSecretDE");
         properties.put("org.killbill.billing.plugin.adyen.hmac.algorithm", "UK#DefaultAlgorithmUK|US#DefaultAlgorithmUS|DE#DefaultAlgorithmDE");
+        properties.put("org.killbill.billing.plugin.adyen.pending3DsPaymentExpirationPeriod", "PT10m");
         final AdyenConfigProperties adyenConfigProperties = new AdyenConfigProperties(properties);
 
         Assert.assertEquals(adyenConfigProperties.getMerchantAccount("UK"), "DefaultAccountUK");
@@ -83,6 +88,7 @@ public class TestAdyenConfigProperties {
         Assert.assertEquals(adyenConfigProperties.getHmacAlgorithm("DefaultSkinUK"), "DefaultAlgorithmUK");
         Assert.assertEquals(adyenConfigProperties.getHmacAlgorithm("DefaultSkinDE"), "DefaultAlgorithmDE");
         Assert.assertEquals(adyenConfigProperties.getHmacAlgorithm("DefaultSkinUS"), "DefaultAlgorithmUS");
+        Assert.assertEquals(adyenConfigProperties.getPending3DsPaymentExpirationPeriod(), Period.minutes(10));
     }
 
     @Test(groups = "fast")
